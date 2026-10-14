@@ -95,6 +95,7 @@ function main(data: Data) {
       target.innerHTML = mdRender(code, {
         theme: toTheme(configData.pageTheme),
         plugins: configData.mdPlugins,
+        mathBrackets: configData.mathBrackets,
         ...options,
       })
       const ele = target instanceof Ele ? target.ele : target

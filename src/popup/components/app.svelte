@@ -87,6 +87,18 @@
       </FormField>
     </div>
 
+    <div class="form-item inline">
+      <span class="label-item">{localize('label_math-brackets')}:</span>
+      <FormField align="end">
+        <Switch
+          disabled={!data.enable || !data.mdPlugins.includes('Katex')}
+          bind:checked={data.mathBrackets}
+          color="primary"
+          on:change={() => updateConfig('mathBrackets', data.mathBrackets)}
+        />
+      </FormField>
+    </div>
+
     <div class="form-item">
       <div class="label-item">{localize('label_md-plugins')}:</div>
       <Set

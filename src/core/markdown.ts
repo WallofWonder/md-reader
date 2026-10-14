@@ -11,6 +11,7 @@ import mFootnote from 'markdown-it-footnote'
 import mTaskLists from 'markdown-it-task-lists'
 import mToc from 'markdown-it-table-of-contents'
 import mKatex from '@traptitech/markdown-it-katex'
+import mKatexBrackets from '@/plugins/katex-brackets'
 import mMermaid from '@md-reader/markdown-it-mermaid'
 import mAlert from '@/plugins/alert'
 import mGraphvizBlock from '@/plugins/graphviz-block'
@@ -29,7 +30,7 @@ const PLUGINS: Plugins = {
   Sup: [mSup],
   Ins: [mIns],
   Abbr: [mAbbr],
-  Katex: [mKatex],
+  Katex: ({ mathBrackets }) => [mathBrackets ? mKatexBrackets : mKatex],
   Mermaid: ({ theme }) => [
     mMermaid,
     { theme: theme === 'dark' ? 'dark' : 'default', themeVariables: undefined },

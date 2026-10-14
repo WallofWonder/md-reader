@@ -49,6 +49,7 @@ const actionMap = {
   refresh: 'toggleRefresh',
   centered: 'toggleCentered',
   mdPlugins: 'updateMdPlugins',
+  mathBrackets: 'updateMdPlugins',
   pageTheme: 'updatePageTheme',
   hiddenSide: 'toggleSide',
 }
