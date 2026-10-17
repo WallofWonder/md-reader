@@ -8,6 +8,7 @@ import className from '@/config/class-name'
 import type { Theme } from '@/config/page-themes'
 import { getDefaultData, type Data } from '@/core/data'
 import { mdRender, type MdOptions } from '@/core/markdown'
+import { fetchText } from '@/core/fetch-text'
 import {
   getHeads,
   getRawContainer,
@@ -232,6 +233,15 @@ function main(data: Data) {
     }
   })
 
+  /* re-decode when Chrome guessed a non-UTF-8 charset; same-origin fetch keeps
+     the page's cookies, which servers like JetBrains built-in require */
+  if (document.characterSet !== 'UTF-8' && location.protocol !== 'file:') {
+    fetchText(location.href, document.characterSet).then(
+      updateRaw,
+      console.error,
+    )
+  }
+
   /* auto refresh */
   if (configData.refresh) {
     polling()
@@ -240,26 +250,34 @@ function main(data: Data) {
   function polling() {
     void (function watch() {
       clearTimeout(pollingTimer)
-      chrome.runtime.sendMessage({ action: 'fetch' }, res => {
-        if (res !== undefined) {
-          if (mdRaw === undefined || mdRaw === null) {
-            if (res) {
-              window.location.reload()
-              return
+      chrome.runtime.sendMessage(
+        { action: 'fetch', data: document.characterSet },
+        res => {
+          if (res !== undefined) {
+            if (mdRaw === undefined || mdRaw === null) {
+              if (res) {
+                window.location.reload()
+                return
+              }
+            } else {
+              updateRaw(res)
             }
-          } else if (mdRaw !== res) {
-            mdRaw = res
-            contentRender(res)
-            renderSide()
-            /* update raw content */
-            setTimeout(() => {
-              rawContainer.textContent = res
-            }, 0)
           }
-        }
-        pollingTimer = setTimeout(watch, 500)
-      })
+          pollingTimer = setTimeout(watch, 500)
+        },
+      )
     })()
+  }
+
+  function updateRaw(res: string) {
+    if (mdRaw === res) return
+    mdRaw = res
+    contentRender(res)
+    renderSide()
+    /* update raw content */
+    setTimeout(() => {
+      rawContainer.textContent = res
+    }, 0)
   }
 
   function renderSide() {

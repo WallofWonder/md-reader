@@ -1,5 +1,6 @@
 import storage from '@/core/storage'
 import commands from '@/core/commands'
+import { fetchText } from '@/core/fetch-text'
 
 chrome.runtime.onMessage.addListener(({ action, data }, sender, callback) => {
   messageHandler(action, data, sender, callback)
@@ -19,24 +20,22 @@ async function messageHandler(
       callback?.(data)
       break
     case 'fetch':
-      fetchData(sender.url).then(callback)
+      fetchData(sender.url, data).then(callback)
       break
   }
 }
 
-async function fetchData(url?: string) {
+async function fetchData(url?: string, charset?: string) {
   if (!url) {
     const error = new Error('Fetch error: URL is undefined.')
     console.error(error)
     return error.message
   }
 
-  return fetch(url)
-    .then(res => res.text())
-    .catch(err => {
-      console.error(err)
-      return err.message
-    })
+  return fetchText(url, charset).catch(err => {
+    console.error(err)
+    return err.message
+  })
 }
 
 // Chrome extension shortcuts
